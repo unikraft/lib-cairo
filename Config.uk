@@ -1,0 +1,9 @@
+config LIBCAIRO
+    bool "Cairo - 2D graphics library"
+    depends on HAVE_LIBC
+    select LIBCOMPILER_RT
+    select LIBPIXMAN
+    select LIBFREETYPE
+    select LIBPNG
+    select LIBZLIB
+    default n

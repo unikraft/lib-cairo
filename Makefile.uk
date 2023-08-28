@@ -1,0 +1,225 @@
+#  libcairo Makefile.uk
+#
+#  Authors: Andrei Tatar <andrei@unikraft.io>
+#
+#  Copyright (c) 2023, Unikraft GmbH and The Unikraft Authors.
+#
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions
+#  are met:
+#
+#  1. Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
+#  2. Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in the
+#     documentation and/or other materials provided with the distribution.
+#  3. Neither the name of the copyright holder nor the names of its
+#     contributors may be used to endorse or promote products derived from
+#     this software without specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+#  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+#  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+#  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+#  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+#  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+#  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+#  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+#  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+#  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#  POSSIBILITY OF SUCH DAMAGE.
+#
+
+################################################################################
+# Library registration
+################################################################################
+$(eval $(call addlib_s,libcairo,$(CONFIG_LIBCAIRO)))
+
+################################################################################
+# Sources
+################################################################################
+LIBCAIRO_VERSION=1.17.8
+LIBCAIRO_URL=https://cairographics.org/snapshots/cairo-$(LIBCAIRO_VERSION).tar.xz
+LIBCAIRO_DIRNAME=cairo-$(LIBCAIRO_VERSION)
+#LIBCAIRO_PATCHDIR=$(LIBCAIRO_BASE)/patches
+$(eval $(call fetch,libcairo,$(LIBCAIRO_URL)))
+#$(eval $(call patch,libcairo,$(LIBCAIRO_PATCHDIR),$(LIBCAIRO_DIRNAME)))
+
+################################################################################
+# Helpers
+################################################################################
+LIBCAIRO_SRC = $(LIBCAIRO_ORIGIN)/$(LIBCAIRO_DIRNAME)
+
+################################################################################
+# Library includes
+################################################################################
+# API
+LIBCAIRO__API += -I$(LIBCAIRO_SRC)/src
+# For cairo-features.h which is included from cairo.h
+LIBCAIRO__API += -iquote$(LIBCAIRO_BASE)/include
+
+CINCLUDES-$(CONFIG_LIBCAIRO) += $(LIBCAIRO__API)
+CXXINCLUDES-$(CONFIG_LIBCAIRO) += $(LIBCAIRO__API)
+
+# Internal
+LIBCAIRO_CINCLUDES += -iquote$(LIBCAIRO_BASE)/include
+LIBCAIRO_CINCLUDES += -iquote$(LIBCAIRO_SRC)/boilerplate
+
+################################################################################
+# Global flags
+################################################################################
+LIBCAIRO_CFLAGS += -D_FILE_OFFSET_BITS=64
+LIBCAIRO_CFLAGS += -D_GNU_SOURCE
+LIBCAIRO_CFLAGS += -D_REENTRANT
+LIBCAIRO_CFLAGS += -fno-strict-aliasing
+LIBCAIRO_CFLAGS += -fno-common
+LIBCAIRO_CFLAGS += -Wno-missing-field-initializers
+LIBCAIRO_CFLAGS += -Wno-unused-parameter
+LIBCAIRO_CFLAGS += -Wno-attributes
+LIBCAIRO_CFLAGS += -Wno-long-long
+LIBCAIRO_CFLAGS += -Wno-unused-but-set-variable
+LIBCAIRO_CFLAGS += -Wno-enum-conversion
+LIBCAIRO_CFLAGS-$(call have_gcc) += -Wno-maybe-uninitialized
+LIBCAIRO_CFLAGS-$(call have_clang) += -Wno-documentation
+LIBCAIRO_CFLAGS-$(call have_clang) += -Wno-documentation-unknown-command
+
+################################################################################
+# Library sources
+################################################################################
+# These are taken from the upstream build in the order that ninja builds them.
+# Please take care to maintain the order when updating.
+################################################################################
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-analysis-surface.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-arc.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-array.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-atomic.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-base64-stream.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-base85-stream.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-bentley-ottmann-rectangular.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-bentley-ottmann-rectilinear.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-bentley-ottmann.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-botor-scan-converter.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-boxes-intersect.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-boxes.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-cache.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-clip-boxes.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-clip-polygon.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-clip-region.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-clip-surface.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-clip-tor-scan-converter.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-clip.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-color.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-composite-rectangles.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-compositor.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-contour.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-damage.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-debug.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-default-context.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-device.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-error.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-fallback-compositor.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-fixed.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-font-face-twin-data.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-font-face-twin.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-font-face.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-font-options.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-freed-pool.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-freelist.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-gstate.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-hash.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-hull.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-image-compositor.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-image-info.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-image-source.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-image-surface.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-line.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-lzw.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-mask-compositor.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-matrix.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-mempool.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-mesh-pattern-rasterizer.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-misc.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-mono-scan-converter.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-mutex.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-no-compositor.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-observer.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-output-stream.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-paginated-surface.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-path-bounds.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-path-fill.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-path-fixed.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-path-in-fill.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-path-stroke-boxes.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-path-stroke-polygon.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-path-stroke-traps.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-path-stroke-tristrip.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-path-stroke.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-path.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-pattern.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-pen.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-polygon-intersect.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-polygon-reduce.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-polygon.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-raster-source-pattern.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-recording-surface.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-rectangle.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-rectangular-scan-converter.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-region.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-rtree.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-scaled-font.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-shape-mask-compositor.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-slope.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-spans-compositor.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-spans.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-spline.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-stroke-dash.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-stroke-style.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-surface-clipper.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-surface-fallback.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-surface-observer.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-surface-offset.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-surface-snapshot.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-surface-subsurface.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-surface-wrapper.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-surface.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-time.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-tor-scan-converter.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-tor22-scan-converter.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-toy-font-face.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-traps-compositor.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-traps.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-tristrip.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-unicode.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-user-font.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-version.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-wideint.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-cff-subset.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-scaled-font-subsets.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-truetype-subset.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-type1-fallback.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-type1-glyph-names.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-type1-subset.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-type3-glyph-surface.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-pdf-operators.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-pdf-shading.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-tag-attributes.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-tag-stack.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-deflate-stream.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-png.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-svg-surface.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-ft-font.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-colr-glyph-render.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-svg-glyph-render.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-script-surface.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-ps-surface.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-pdf-surface.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/src/cairo-pdf-interchange.c
+#LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/boilerplate/cairo-boilerplate-getopt.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/boilerplate/cairo-boilerplate-system.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/boilerplate/cairo-boilerplate.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/boilerplate/cairo-boilerplate-svg.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/boilerplate/cairo-boilerplate-script.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/boilerplate/cairo-boilerplate-ps.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_SRC)/boilerplate/cairo-boilerplate-pdf.c
+LIBCAIRO_SRCS-y += $(LIBCAIRO_BASE)/boilerplate/cairo-boilerplate-constructors.c
